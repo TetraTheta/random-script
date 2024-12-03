@@ -21,11 +21,8 @@ if __name__ == "__main__":
         from colorama import Fore, Style
         from colorama import init as colorinit
     except ModuleNotFoundError:
-        subprocess.run([sys.executable, "-m", "pip", "install", "colorama"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        result = subprocess.run([sys.executable] + sys.argv)
-        sys.exit(result.returncode)
-        from colorama import Fore, Style
-        from colorama import init as colorinit
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "colorama"])
+        sys.exit(subprocess.call([sys.executable] + sys.argv))
 
     colorinit()
 

@@ -11,17 +11,7 @@ def convert(image_path, output_dir):
     output_path = os.path.join(output_dir, f"{name}.png")
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    subprocess.run(
-        [
-            "ffmpeg",
-            "-i",
-            image_path,
-            "-vf",
-            "crop='if(gt(iw,ih),ih,iw):if(gt(iw,ih),ih,iw)',scale=128:128",
-            "-y",
-            output_path,
-        ]
-    )
+    subprocess.call(["ffmpeg", "-i", image_path, "-vf", "crop='if(gt(iw,ih),ih,iw):if(gt(iw,ih),ih,iw)',scale=128:128", "-y", output_path])
 
 
 if __name__ == "__main__":

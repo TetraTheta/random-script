@@ -1,4 +1,5 @@
 # Remove unnecessay files from SourceMod to make it GMod Addon
+# Requirement: lowercase
 param(
   [string] $directory = (Get-Location)
 )
@@ -59,8 +60,8 @@ foreach ($d in $dtp) {
   }
 }
 
-# Lowercase files via 'lowercase.exe'
-$proc = Start-Process -NoNewWindow -Wait -FilePath 'lowercase.exe' -ArgumentList "-y `"$directory`""
+# Lowercase files via 'lowercase'
+Start-Process -NoNewWindow -Wait -FilePath 'lowercase.cmd' -ArgumentList "-y `"$directory`""
 
 # Remove obvious directories
 $dirsToRemove = @(
