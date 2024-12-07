@@ -31,9 +31,9 @@ if __name__ == "__main__":
     # Parse command line
     from argparse import ArgumentParser
 
-    cli = ArgumentParser(prog="lowercase")
-    cli.add_argument("-y", "--yes", action="store_true")
-    cli.add_argument("target", nargs="?", default=Path.cwd().resolve(), type=Path)
+    cli = ArgumentParser(prog="remove-empty-directory", description="Remove empty directories from given path")
+    cli.add_argument("-y", "--yes", action="store_true", help="Skip confirmation")
+    cli.add_argument("target", type=Path, default=Path.cwd().resolve(), nargs="?", help="Target directory")
 
     args = cli.parse_args()
 
