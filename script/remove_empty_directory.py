@@ -1,31 +1,33 @@
 import os
-import subprocess
 import sys
 from pathlib import Path
 
 
-def remove_empty_directory(dir: Path):
+class Color:
+    CYAN = "\033[0;36m"
+    GREEN = "\033[0;32m"
+    RED = "\033[0;31m"
+    RESET = "\033[0m"
+    YELLOW = "\033[1;33m"
+
+
+def remove_empty_directory(dir: Path, top_level: Path = None):
+    if top_level is None:
+        top_level = dir
+
     for subdir in dir.iterdir():
         if subdir.is_dir():
-            remove_empty_directory(subdir)
-    try:
-        dir.rmdir()
-        print(f"{Fore.YELLOW}REMOVE{Style.RESET_ALL} {dir.parent}{os.sep}{Fore.YELLOW}{dir.name}{Style.RESET_ALL}")
-    except OSError:
-        pass
+            remove_empty_directory(subdir, top_level)
+
+    if dir != top_level:
+        try:
+            dir.rmdir()
+            print(f"{Color.YELLOW}REMOVE{Color.RESET} {dir.parent}{os.sep}{Color.YELLOW}{dir.name}{Color.RESET}")
+        except OSError:
+            pass
 
 
 if __name__ == "__main__":
-    # Install colorama if not present
-    try:
-        from colorama import Fore, Style
-        from colorama import init as colorinit
-    except ModuleNotFoundError:
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "colorama"])
-        sys.exit(subprocess.call([sys.executable] + sys.argv))
-
-    colorinit()
-
     # Parse command line
     from argparse import ArgumentParser
 
@@ -38,16 +40,16 @@ if __name__ == "__main__":
     args.target = args.target.resolve()
 
     if not args.target.is_dir():
-        print(f"{Fore.RED}ERROR{Style.RESET_ALL} Given path '{args.target}' is not a directory")
+        print(f"{Color.RED}ERROR{Color.RESET} Given path '{args.target}' is not a directory")
         sys.exit(1)
 
     if not args.yes:
-        print(f"{Fore.GREEN}TARGET{Style.RESET_ALL} {args.target}")
+        print(f"{Color.GREEN}TARGET{Color.RESET} {args.target}")
         result = input("Do you want to lowercase any sub directory or files of this directory? (yes/no): ")
         if result.lower() == "yes" or result.lower() == "y":
             remove_empty_directory(args.target)
         else:
-            print(f"{Fore.RED}ERROR{Style.RESET_ALL} User canceled the opration")
+            print(f"{Color.RED}ERROR{Color.RESET} User canceled the opration")
             sys.exit(1)
     else:
         remove_empty_directory(args.target)
