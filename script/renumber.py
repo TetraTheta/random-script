@@ -1,4 +1,6 @@
+import shutil
 import sys
+from argparse import ArgumentParser, ArgumentTypeError, RawTextHelpFormatter
 from pathlib import Path
 
 
@@ -36,7 +38,9 @@ def renumber(dir: Path, ext: str, digit: int, start: int):
 
 if __name__ == "__main__":
     # Parse command line
-    from argparse import ArgumentParser, ArgumentTypeError
+    class CustomFormatter(RawTextHelpFormatter):
+        def __init__(self, prog):
+            super().__init__(prog, width=max(80, shutil.get_terminal_size().columns - 2))
 
     def check_non_negative(value) -> int:
         try:
@@ -58,16 +62,16 @@ if __name__ == "__main__":
         except ValueError:
             raise ArgumentTypeError(f"{value} is not a number")
 
-    cli = ArgumentParser(prog="renumber", description="Rename image files in a directory with sequential numbering.")
+    cli = ArgumentParser(prog="renumber", description="Rename image files in a directory with sequential numbering.", formatter_class=CustomFormatter)
     cli.add_argument("-e", "--ext", type=str, default="webp", choices=["bmp", "gif", "jpg", "png", "webp"], help="Extension(s) of image files to rename, separated by commas.\n(default: webp)")
     cli.add_argument("-s", "--start", type=check_non_negative, default=1, help="Starting number for renaming. Must be non-negative integer.\n(default: 1)")
     cli.add_argument("-d", "--digit", type=check_positive, default=3, help="Number of digits for renamed files.\n(default: 3)")
-    cli.add_argument("-y", "--yes", action="store_true", help="Skip confirmation")
-    cli.add_argument("target", type=Path, default=Path.cwd().resolve(), nargs="?", help=f"Target directory.\n(default: {Path.cwd().resolve()})")
+    cli.add_argument("-y", "--yes", action="store_true", help="Skip confirmation\n(default: False)")
+    cli.add_argument("target", default=str(Path.cwd()), nargs="?", help=f"Target directory.\n(default: {Path.cwd()})")
 
     args = cli.parse_args()
 
-    args.target = args.target.resolve()
+    args.target = Path(args.target).resolve()
 
     if not args.target.is_dir():
         print(f"{Color.RED}ERROR{Color.RESET} Given path '{args.target}' is not a directory")
