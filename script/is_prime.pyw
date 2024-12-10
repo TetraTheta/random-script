@@ -1,7 +1,6 @@
 import sys
 import tkinter.messagebox as msgbox
 
-
 def is_prime(n):
     if n < 2:
         return False
@@ -9,7 +8,6 @@ def is_prime(n):
         if n % i == 0:
             return False
     return True
-
 
 try:
     number = int(sys.argv[1])  # Convert the input to an integer

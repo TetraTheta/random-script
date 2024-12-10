@@ -3,14 +3,16 @@ import sys
 from argparse import ArgumentParser, ArgumentTypeError, RawTextHelpFormatter
 from pathlib import Path
 
-
 class Color:
-    CYAN = "\033[0;36m"
+    BLUE = "\033[0;36m"
     GREEN = "\033[0;32m"
     RED = "\033[0;31m"
     RESET = "\033[0m"
     YELLOW = "\033[1;33m"
 
+class CustomFormatter(RawTextHelpFormatter):
+    def __init__(self, prog):
+        super().__init__(prog, width=max(80, shutil.get_terminal_size().columns - 2))
 
 def renumber(dir: Path, ext: str, digit: int, start: int):
     exts = [f".{e.strip().lower()}" for e in ext.split(",")]
@@ -35,55 +37,51 @@ def renumber(dir: Path, ext: str, digit: int, start: int):
 
     print(f"{Color.GREEN}INFO{Color.RESET} Renumber complete.")
 
-
-if __name__ == "__main__":
-    # Parse command line
-    class CustomFormatter(RawTextHelpFormatter):
-        def __init__(self, prog):
-            super().__init__(prog, width=max(80, shutil.get_terminal_size().columns - 2))
-
-    def check_non_negative(value) -> int:
-        try:
-            number = int(value)
-            if not number >= 0:
-                raise ArgumentTypeError(f"{number} is not non-negative integer ({number} >= 0)")
-            else:
-                return number
-        except ValueError:
-            raise ArgumentTypeError(f"{value} is not a number")
-
-    def check_positive(value) -> int:
-        try:
-            number = int(value)
-            if not number > 0:
-                raise ArgumentTypeError(f"{number} must be positive number ({number} > 0)")
-            else:
-                return number
-        except ValueError:
-            raise ArgumentTypeError(f"{value} is not a number")
-
-    cli = ArgumentParser(prog="renumber", description="Rename image files in a directory with sequential numbering.", formatter_class=CustomFormatter)
-    cli.add_argument("-e", "--ext", type=str, default="webp", choices=["bmp", "gif", "jpg", "png", "webp"], help="Extension(s) of image files to rename, separated by commas.\n(default: webp)")
-    cli.add_argument("-s", "--start", type=check_non_negative, default=1, help="Starting number for renaming. Must be non-negative integer.\n(default: 1)")
-    cli.add_argument("-d", "--digit", type=check_positive, default=3, help="Number of digits for renamed files.\n(default: 3)")
-    cli.add_argument("-y", "--yes", action="store_true", help="Skip confirmation\n(default: False)")
-    cli.add_argument("target", default=str(Path.cwd()), nargs="?", help=f"Target directory.\n(default: {Path.cwd()})")
-
-    args = cli.parse_args()
-
-    args.target = Path(args.target).resolve()
-
-    if not args.target.is_dir():
-        print(f"{Color.RED}ERROR{Color.RESET} Given path '{args.target}' is not a directory")
-        sys.exit(1)
-
-    if not args.yes:
-        print(f"{Color.GREEN}TARGET{Color.RESET} {args.target}")
-        result = input("Do you want to renumber image files of this directory? (yes/no): ")
-        if result.lower() == "yes" or result.lower() == "y":
-            renumber(args.target, args.ext, args.digit, args.start)
+def check_non_negative(value) -> int:
+    try:
+        number = int(value)
+        if not number >= 0:
+            raise ArgumentTypeError(f"{number} is not non-negative integer ({number} >= 0)")
         else:
-            print(f"{Color.RED}ERROR{Color.RESET} User canceled the opration")
-            sys.exit(1)
-    else:
+            return number
+    except ValueError:
+        raise ArgumentTypeError(f"{value} is not a number")
+
+def check_positive(value) -> int:
+    try:
+        number = int(value)
+        if not number > 0:
+            raise ArgumentTypeError(f"{number} must be positive number ({number} > 0)")
+        else:
+            return number
+    except ValueError:
+        raise ArgumentTypeError(f"{value} is not a number")
+
+##########
+#  MAIN  #
+##########
+cli = ArgumentParser(prog="renumber", description="Rename image files in a directory with sequential numbering.", formatter_class=CustomFormatter)
+cli.add_argument("-e", "--ext", type=str, default="webp", choices=["bmp", "gif", "jpg", "png", "webp"], help="Extension(s) of image files to rename, separated by commas.\n(default: webp)")
+cli.add_argument("-s", "--start", type=check_non_negative, default=1, help="Starting number for renaming. Must be non-negative integer.\n(default: 1)")
+cli.add_argument("-d", "--digit", type=check_positive, default=3, help="Number of digits for renamed files.\n(default: 3)")
+cli.add_argument("-y", "--yes", action="store_true", help="Skip confirmation\n(default: False)")
+cli.add_argument("target", default=str(Path.cwd()), nargs="?", help=f"Target directory.\n(default: {Path.cwd()})")
+
+args = cli.parse_args()
+
+args.target = Path(args.target).resolve()
+
+if not args.target.is_dir():
+    print(f"{Color.RED}ERROR{Color.RESET} Given path '{args.target}' is not a directory")
+    sys.exit(1)
+
+if not args.yes:
+    print(f"{Color.GREEN}TARGET{Color.RESET} {args.target}")
+    result = input("Do you want to renumber image files of this directory? (yes/no): ")
+    if result.lower() == "yes" or result.lower() == "y":
         renumber(args.target, args.ext, args.digit, args.start)
+    else:
+        print(f"{Color.RED}ERROR{Color.RESET} User canceled the opration")
+        sys.exit(1)
+else:
+    renumber(args.target, args.ext, args.digit, args.start)

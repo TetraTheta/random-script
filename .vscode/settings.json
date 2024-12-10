@@ -1,3 +1,7 @@
 {
-  "ruff.lineLength": 320
+  "[python]": {
+    "editor.defaultFormatter": "eeyore.yapf"
+  },
+  "ruff.lineLength": 320,
+  "yapf.args": ["--style={blank_lines_around_top_level_definition: 1, blank_line_before_nested_class_or_def: 0, column_limit: 320}"]
 }
