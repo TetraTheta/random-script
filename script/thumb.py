@@ -4,6 +4,7 @@ import sys
 
 exts = (".bmp", ".jpg", ".jpeg", ".png", ".webp")
 
+
 def convert(image_path, output_dir):
     print(image_path)
     name, _ = os.path.splitext(os.path.basename(image_path))
@@ -11,6 +12,7 @@ def convert(image_path, output_dir):
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     subprocess.call(["ffmpeg", "-i", image_path, "-vf", "crop='if(gt(iw,ih),ih,iw):if(gt(iw,ih),ih,iw)',scale=128:128", "-y", output_path])
+
 
 if len(sys.argv) < 2:
     target = os.getcwd()

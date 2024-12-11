@@ -3,6 +3,7 @@ import sys
 from argparse import ArgumentParser, ArgumentTypeError, RawTextHelpFormatter
 from pathlib import Path
 
+
 class Color:
     BLUE = "\033[0;36m"
     GREEN = "\033[0;32m"
@@ -10,9 +11,19 @@ class Color:
     RESET = "\033[0m"
     YELLOW = "\033[1;33m"
 
+
 class CustomFormatter(RawTextHelpFormatter):
     def __init__(self, prog):
         super().__init__(prog, width=max(80, shutil.get_terminal_size().columns - 2))
+
+
+class RenumberNamespace:
+    digit: int
+    ext: str
+    start: int
+    target: str | Path
+    yes: bool
+
 
 def renumber(dir: Path, ext: str, digit: int, start: int):
     exts = [f".{e.strip().lower()}" for e in ext.split(",")]
@@ -37,6 +48,7 @@ def renumber(dir: Path, ext: str, digit: int, start: int):
 
     print(f"{Color.GREEN}INFO{Color.RESET} Renumber complete.")
 
+
 def check_non_negative(value) -> int:
     try:
         number = int(value)
@@ -46,6 +58,7 @@ def check_non_negative(value) -> int:
             return number
     except ValueError:
         raise ArgumentTypeError(f"{value} is not a number")
+
 
 def check_positive(value) -> int:
     try:
@@ -57,17 +70,18 @@ def check_positive(value) -> int:
     except ValueError:
         raise ArgumentTypeError(f"{value} is not a number")
 
+
 ##########
 #  MAIN  #
 ##########
 cli = ArgumentParser(prog="renumber", description="Rename image files in a directory with sequential numbering.", formatter_class=CustomFormatter)
-cli.add_argument("-e", "--ext", type=str, default="webp", choices=["bmp", "gif", "jpg", "png", "webp"], help="Extension(s) of image files to rename, separated by commas.\n(default: webp)")
+cli.add_argument("-e", "--ext", type=str, default="webp", choices=["bmp", "gif", "jpg", "png", "webp"], help="Extension(s) of image files to rename, separated by commas\n(default: webp)")
 cli.add_argument("-s", "--start", type=check_non_negative, default=1, help="Starting number for renaming. Must be non-negative integer.\n(default: 1)")
-cli.add_argument("-d", "--digit", type=check_positive, default=3, help="Number of digits for renamed files.\n(default: 3)")
+cli.add_argument("-d", "--digit", type=check_positive, default=3, help="Number of digits for renamed files\n(default: 3)")
 cli.add_argument("-y", "--yes", action="store_true", help="Skip confirmation\n(default: False)")
-cli.add_argument("target", default=str(Path.cwd()), nargs="?", help=f"Target directory.\n(default: {Path.cwd()})")
+cli.add_argument("target", default=str(Path.cwd()), nargs="?", help=f"Target directory\n(default: {Path.cwd()})")
 
-args = cli.parse_args()
+args = cli.parse_args(namespace=RenumberNamespace)
 
 args.target = Path(args.target).resolve()
 

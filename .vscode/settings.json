@@ -1,7 +1,7 @@
 {
   "[python]": {
-    "editor.defaultFormatter": "eeyore.yapf"
+    "editor.defaultFormatter": "charliermarsh.ruff" // "eeyore.yapf"
   },
   "ruff.lineLength": 320,
-  "yapf.args": ["--style={blank_lines_around_top_level_definition: 1, blank_line_before_nested_class_or_def: 0, column_limit: 320}"]
+  "yapf.args": ["--style={arithmetic_precedence_indication: False, blank_lines_around_top_level_definition: 1, blank_line_before_nested_class_or_def: 0, column_limit: 320}"]
 }
