@@ -1,20 +1,14 @@
-import shutil
 import sys
-from argparse import ArgumentParser, ArgumentTypeError, RawTextHelpFormatter
+from argparse import ArgumentParser, ArgumentTypeError
 from pathlib import Path
 
+# ==== Import internal dependency ====
+sys.dont_write_bytecode = True
+sys.path.append(str(Path(__file__).parent))
+from library.python_lib import Color, CustomFormatter  # noqa: E402
 
-class Color:
-    BLUE = "\033[0;36m"
-    GREEN = "\033[0;32m"
-    RED = "\033[0;31m"
-    RESET = "\033[0m"
-    YELLOW = "\033[1;33m"
-
-
-class CustomFormatter(RawTextHelpFormatter):
-    def __init__(self, prog):
-        super().__init__(prog, width=max(80, shutil.get_terminal_size().columns - 2))
+sys.dont_write_bytecode = False
+# ==== Import internal dependency END ====
 
 
 class RenumberNamespace:
