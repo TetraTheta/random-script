@@ -3,13 +3,7 @@ import sys
 from argparse import ArgumentParser
 from pathlib import Path
 
-# ==== Import internal dependency ====
-sys.dont_write_bytecode = True
-sys.path.append(str(Path(__file__).parent))
 from library.python_lib import Color, CustomFormatter  # noqa: E402
-
-sys.dont_write_bytecode = False
-# ==== Import internal dependency END ====
 
 
 class RemoveEmptyDirectoryNamespace:
