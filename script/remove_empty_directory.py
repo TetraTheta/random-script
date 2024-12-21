@@ -35,7 +35,6 @@ cli.add_argument("-y", "--yes", action="store_true", help="Skip confirmation\n(d
 cli.add_argument("target", default=str(Path.cwd()), nargs="?", help=f"Target directory\n(default: {Path.cwd()})")  # I can't use 'type=Path' because it can't handle '.' being passed to it
 
 args = cli.parse_args(namespace=RemoveEmptyDirectoryNamespace)
-
 args.target = Path(args.target).resolve()
 
 if not args.target.is_dir():

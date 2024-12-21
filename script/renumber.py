@@ -71,7 +71,6 @@ cli.add_argument("-y", "--yes", action="store_true", help="Skip confirmation\n(d
 cli.add_argument("target", default=str(Path.cwd()), nargs="?", help=f"Target directory\n(default: {Path.cwd()})")
 
 args = cli.parse_args(namespace=RenumberNamespace)
-
 args.target = Path(args.target).resolve()
 
 if not args.target.is_dir():
