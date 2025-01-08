@@ -3,7 +3,7 @@ from argparse import ArgumentParser, ArgumentTypeError
 from pathlib import Path
 
 
-from library.python_lib import Color, CustomFormatter  # noqa: E402
+from library.python_lib import Color, CustomFormatter, natural_sort  # noqa: E402
 
 
 class RenumberNamespace:
@@ -16,7 +16,7 @@ class RenumberNamespace:
 
 def renumber(dir: Path, ext: str, digit: int, start: int):
     exts = [f".{e.strip().lower()}" for e in ext.split(",")]
-    files = sorted([f for f in dir.iterdir() if f.suffix.lower() in exts and f.is_file()], key=lambda x: x.name.lower())
+    files = natural_sort([f for f in dir.iterdir() if f.suffix.lower() in exts and f.is_file()])
 
     if not files:
         print(f"{Color.RED}ERROR{Color.RESET} There is no file with extension(s) {exts} in '{dir}'.")
