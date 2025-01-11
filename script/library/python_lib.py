@@ -48,4 +48,4 @@ dre = compile(r"(\d+)")  # pre-compile for speed
 
 
 def natural_sort(lst: list) -> list:
-    return sorted(lst, key=lambda p: [int(s) if s.isdigit() else s.lower() for s in split(dre, p)])
+    return sorted(lst, key=lambda p: [int(s) if s.isdigit() else s.lower() for s in split(dre, str(p))])
