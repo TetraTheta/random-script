@@ -1,9 +1,22 @@
 import os
+import shutil
 import sys
-from argparse import ArgumentParser
+from argparse import ArgumentParser, RawTextHelpFormatter
 from pathlib import Path
 
-from library.python_lib import Color, CustomFormatter  # noqa: E402
+
+class Color:
+    BLUE = "\033[0;36m"
+    GREEN = "\033[0;32m"
+    RED = "\033[0;31m"
+    RESET = "\033[0m"
+    YELLOW = "\033[1;33m"
+
+
+class CustomFormatter(RawTextHelpFormatter):
+    def __init__(self, prog):
+        super().__init__(prog, width=max(80, shutil.get_terminal_size().columns - 2))
+
 
 # This script requires > 3.12 (Path.is_junction())
 if sys.version_info < (3, 12):
@@ -67,20 +80,21 @@ cli = ArgumentParser(prog="remove-empty-directory", description="Remove empty di
 cli.add_argument("-y", "--yes", action="store_true", help="Skip confirmation\n(default: False)")
 cli.add_argument("target", default=str(Path.cwd()), nargs="?", help=f"Target directory\n(default: {Path.cwd()})")  # I can't use 'type=Path' because it can't handle '.' being passed to it
 
-args = cli.parse_args(namespace=RemoveEmptyDirectoryNamespace)
-args.target = Path(args.target).resolve()
+if __name__ == "__main__":
+    args = cli.parse_args(namespace=RemoveEmptyDirectoryNamespace)
+    args.target = Path(args.target).resolve()
 
-if not args.target.is_dir():
-    print(f"{Color.RED}ERROR  {Color.RESET} Given path '{args.target}' is not a directory")
-    sys.exit(1)
-
-if not args.yes:
-    print(f"{Color.GREEN}TARGET{Color.RESET} {args.target}")
-    result = input("Do you want to remove empty directories from this path? (yes/no): ")
-    if result.lower() == "yes" or result.lower() == "y":
-        remove_empty_directory(args.target, args.target)
-    else:
-        print(f"{Color.RED}CANCEL {Color.RESET} User canceled the operation")
+    if not args.target.is_dir():
+        print(f"{Color.RED}ERROR  {Color.RESET} Given path '{args.target}' is not a directory")
         sys.exit(1)
-else:
-    remove_empty_directory(args.target, args.target)
+
+    if not args.yes:
+        print(f"{Color.GREEN}TARGET{Color.RESET} {args.target}")
+        result = input("Do you want to remove empty directories from this path? (yes/no): ")
+        if result.lower() == "yes" or result.lower() == "y":
+            remove_empty_directory(args.target, args.target)
+        else:
+            print(f"{Color.RED}CANCEL {Color.RESET} User canceled the operation")
+            sys.exit(1)
+    else:
+        remove_empty_directory(args.target, args.target)

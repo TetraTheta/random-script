@@ -10,14 +10,14 @@ def is_prime(n):
             return False
     return True
 
+if __name__ == "__main__":
+    try:
+        number = int(sys.argv[1])  # Convert the input to an integer
+    except ValueError:
+        msgbox.showerror("ERROR", "Please provide a valid integer.")
+        sys.exit(1)
 
-try:
-    number = int(sys.argv[1])  # Convert the input to an integer
-except ValueError:
-    msgbox.showerror("ERROR", "Please provide a valid integer.")
-    sys.exit(1)
-
-if is_prime(number):
-    msgbox.showinfo("YES", f"{number} is a Prime Number")
-else:
-    msgbox.showwarning("NO", f"{number} is NOT a Prime Number")
+    if is_prime(number):
+        msgbox.showinfo("YES", f"{number} is a Prime Number")
+    else:
+        msgbox.showwarning("NO", f"{number} is NOT a Prime Number")

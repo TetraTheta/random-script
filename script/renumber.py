@@ -1,9 +1,21 @@
+import shutil
 import sys
-from argparse import ArgumentParser, ArgumentTypeError
+from argparse import ArgumentParser, ArgumentTypeError, RawTextHelpFormatter
 from pathlib import Path
+from re import split
 
 
-from library.python_lib import Color, CustomFormatter, natural_sort  # noqa: E402
+class Color:
+    BLUE = "\033[0;36m"
+    GREEN = "\033[0;32m"
+    RED = "\033[0;31m"
+    RESET = "\033[0m"
+    YELLOW = "\033[1;33m"
+
+
+class CustomFormatter(RawTextHelpFormatter):
+    def __init__(self, prog):
+        super().__init__(prog, width=max(80, shutil.get_terminal_size().columns - 2))
 
 
 class RenumberNamespace:
@@ -60,6 +72,12 @@ def check_positive(value) -> int:
         raise ArgumentTypeError(f"{value} is not a number")
 
 
+def natural_sort(lst: list) -> list:
+    # dre = compile(r"(\d+)")
+    # Python seems to cache 'dre' so inlining it would not that cost much
+    return sorted(lst, key=lambda p: [int(s) if s.isdigit() else s.lower() for s in split(compile(r"(\d+)"), str(p))])
+
+
 ##########
 #  MAIN  #
 ##########
@@ -70,20 +88,21 @@ cli.add_argument("-d", "--digit", type=check_positive, default=3, help="Number o
 cli.add_argument("-y", "--yes", action="store_true", help="Skip confirmation\n(default: False)")
 cli.add_argument("target", default=str(Path.cwd()), nargs="?", help=f"Target directory\n(default: {Path.cwd()})")
 
-args = cli.parse_args(namespace=RenumberNamespace)
-args.target = Path(args.target).resolve()
+if __name__ == "__main__":
+    args = cli.parse_args(namespace=RenumberNamespace)
+    args.target = Path(args.target).resolve()
 
-if not args.target.is_dir():
-    print(f"{Color.RED}ERROR{Color.RESET} Given path '{args.target}' is not a directory")
-    sys.exit(1)
-
-if not args.yes:
-    print(f"{Color.GREEN}TARGET{Color.RESET} {args.target}")
-    result = input("Do you want to renumber image files of this directory? (yes/no): ")
-    if result.lower() == "yes" or result.lower() == "y":
-        renumber(args.target, args.ext, args.digit, args.start)
-    else:
-        print(f"{Color.RED}ERROR{Color.RESET} User canceled the opration")
+    if not args.target.is_dir():
+        print(f"{Color.RED}ERROR{Color.RESET} Given path '{args.target}' is not a directory")
         sys.exit(1)
-else:
-    renumber(args.target, args.ext, args.digit, args.start)
+
+    if not args.yes:
+        print(f"{Color.GREEN}TARGET{Color.RESET} {args.target}")
+        result = input("Do you want to renumber image files of this directory? (yes/no): ")
+        if result.lower() == "yes" or result.lower() == "y":
+            renumber(args.target, args.ext, args.digit, args.start)
+        else:
+            print(f"{Color.RED}ERROR{Color.RESET} User canceled the opration")
+            sys.exit(1)
+    else:
+        renumber(args.target, args.ext, args.digit, args.start)
